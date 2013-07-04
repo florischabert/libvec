@@ -6,25 +6,67 @@
 #if defined(__SSE2__)
 
 #include <emmintrin.h>
-typedef __m128i reg128;
+typedef __m128i reg128_t;
 
 #elif defined(__ARM_NEON__)
 
 #include <arm_neon.h>
-typedef int32x4_t reg128;
+typedef int32x4_t reg128_t;
 
 #endif // __ARM_NEON__
 
 template <class type>
 class vec {
 public:
-	vec(reg128 v) : reg(v) {}
+	vec(reg128_t v) : reg(v) {}
 	static vec<type> load(const void *addr);
 	type operator[](int idx);
 	vec<type> operator+(const vec<type> &r);
+	vec<type> operator+(type val);
 	vec<type> operator-(const vec<type> &r);
+	vec<type> operator-(type val);
+	vec<type> operator*(const vec<type> &r);
+	vec<type> operator*(type val);
+	vec<type> operator/(const vec<type> &r);
+	vec<type> operator/(type val);
+	vec<type> operator%(const vec<type> &r);
+	vec<type> operator%(type val);
+	vec<type> & operator++();
+	vec<type> & operator++(int);
+	vec<type> & operator--();
+	vec<type> & operator--(int);
+	vec<type> operator+();
+	vec<type> operator-();
+	vec<type> & operator+=(const vec<type> &r);
+	vec<type> & operator+=(type val);
+	vec<type> & operator-=(const vec<type> &r);
+	vec<type> & operator-=(type val);
+	vec<type> & operator*=(const vec<type> &r);
+	vec<type> & operator*=(type val);
+	vec<type> & operator/=(const vec<type> &r);
+	vec<type> & operator/=(type val);
+	vec<type> & operator%=(const vec<type> &r);
+	vec<type> & operator%=(type val);
+	vec<type> operator<<(int shift);
+	vec<type> operator>>(int shift);
+	vec<type> & operator<<=(int shift);
+	vec<type> & operator>>=(int shift);
+	vec<type> operator~();
+	vec<type> operator&(const vec<type> &r);
+	vec<type> operator&(type val);
+	vec<type> operator|(const vec<type> &r);
+	vec<type> operator|(type val);
+	vec<type> operator^(const vec<type> &r);
+	vec<type> operator^(type val);
+	vec<type> & operator&=(const vec<type> &r);
+	vec<type> & operator&=(type val);
+	vec<type> & operator|=(const vec<type> &r);
+	vec<type> & operator|=(type val);
+	vec<type> & operator^=(const vec<type> &r);
+	vec<type> & operator^=(type val);
+	bool operator==(const vec<type> &r);
 private:
-	reg128 reg;
+	reg128_t reg;
 };
 
 typedef vec<int8_t>   char16;
@@ -56,10 +98,12 @@ template <>
 inline vec<int32_t> vec<int32_t>::operator+(const vec<int32_t> &r) {
 	return vec<int32_t>(_mm_add_epi32(this->reg, r.reg));
 }
+
 template <>
 inline vec<int32_t> vec<int32_t>::operator-(const vec<int32_t> &r) {
 	return vec<int32_t>(_mm_sub_epi32(this->reg, r.reg));
 }
+
 
 #elif defined(__ARM_NEON__)
 
@@ -81,9 +125,10 @@ inline int32_t vec<int32_t>::operator[](int idx) {
 }
 
 template <>
-inline vec<int32_t> vec<int32_t>::operator-(const vec<int32_t> &r) {
+inline vec<int32_t> vec<int32_t>::operator+(const vec<int32_t> &r) {
 	return vec<int32_t>(vaddq_s32(this->reg, r.reg));
 }
+
 template <>
 inline vec<int32_t> vec<int32_t>::operator-(const vec<int32_t> &r) {
 	return vec<int32_t>(vsubq_s32(this->reg, r.reg));
